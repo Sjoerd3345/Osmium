@@ -9,11 +9,8 @@ import net.minecraft.client.font.TextRenderer;
 /**
  * OsmiumDebugOverlay — shows live Osmium stats on screen.
  *
- * Draws a small overlay in the top-left corner showing:
- *   - Current frametime and load
- *   - Spike Shield state
- *   - Particle cap and spawn chance
- *   - Pending task count
+ * Draws a small overlay in the top-left corner showing frametime,
+ * load, spike shield state, and particle info.
  */
 public class OsmiumDebugOverlay {
 
@@ -24,12 +21,12 @@ public class OsmiumDebugOverlay {
             if (!visible) return;
 
             MinecraftClient client = MinecraftClient.getInstance();
-            if (client == null || client.options.debugEnabled) return;
+            if (client == null) return;
+            // Hide our overlay when F3 debug screen is open
+            if (client.getDebugHud().shouldShowDebugHud()) return;
 
             TextRenderer font = client.textRenderer;
-
-            int x = 4, y = 4;
-            int lineH = 10;
+            int x = 4, y = 4, lineH = 10;
 
             String line1 = String.format("§7[Osmium] §f%.1fms §7load:§f%.2f §7q:§f%.0f%%",
                 OsmiumClient.FRAMETIME_LOGGER.getLastFrameMs(),
