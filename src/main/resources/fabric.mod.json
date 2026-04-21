@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "osmium",
+  "version": "${version}",
+  "name": "Osmium",
+  "description": "Client-side performance mod focused on frametime stability and smooth workload control.",
+  "authors": ["You"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/osmium/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.osmium.OsmiumClient"
+    ]
+  },
+  "mixins": [
+    "osmium.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "~1.20.4",
+    "java": ">=21"
+  }
+}
