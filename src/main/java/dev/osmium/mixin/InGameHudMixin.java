@@ -1,38 +1,35 @@
 package dev.osmium.mixin;
 
 import dev.osmium.OsmiumClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.render.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * InGameHudMixin — reduces unnecessary HUD redraws.
- *
- * Hooks into InGameHud.render() to skip redraws when nothing has changed.
- * Uses GuiOptimizer's dirty-flag system to track what needs updating.
+ * GameRendererMixin — hooks into Minecraft's render loop.
+ * Measures real frametime every frame and feeds it into the budget controller.
  */
-@Mixin(InGameHud.class)
-public class InGameHudMixin {
+@Mixin(GameRenderer.class)
+public class GameRendererMixin {
 
     @Inject(
         method = "render",
-        at = @At("HEAD"),
-        cancellable = true
+        at = @At("HEAD")
     )
-    private void osmium$onHudRenderStart(DrawContext context, float tickDelta, CallbackInfo ci) {
-        if (!OsmiumClient.GUI_OPTIMIZER.isAnyElementDirty()) {
-            ci.cancel();
-        }
+    private void osmium$onRenderStart(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
+        OsmiumClient.FRAMETIME_LOGGER.beginFrame();
+        OsmiumClient.PARTICLE_CULLER.updateDynamicCap(0);
     }
 
     @Inject(
         method = "render",
         at = @At("TAIL")
     )
-    private void osmium$onHudRenderEnd(DrawContext context, float tickDelta, CallbackInfo ci) {
-        OsmiumClient.GUI_OPTIMIZER.clearAllDirty();
+    private void osmium$onRenderEnd(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
+        double frameMs = OsmiumClient.FRAMETIME_LOGGER.endFrame();
+        OsmiumClient.BUDGET.update(frameMs);
     }
 }
+
