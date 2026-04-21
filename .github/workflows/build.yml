@@ -1,0 +1,31 @@
+name: Build Osmium
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/loom-cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+      - run: chmod +x gradlew
+      - run: ./gradlew build
+      - name: List build outputs
+        run: find build/libs -type f -name "*.jar"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: osmium-jar
+          path: build/libs/*.jar
+          if-no-files-found: error
