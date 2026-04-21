@@ -7,7 +7,6 @@
   "authors": ["You"],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/osmium/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
@@ -15,7 +14,10 @@
     ]
   },
   "mixins": [
-    "osmium.mixins.json"
+    {
+      "config": "osmium.mixins.json",
+      "environment": "client"
+    }
   ],
   "depends": {
     "fabricloader": ">=0.15.0",
